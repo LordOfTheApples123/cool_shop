@@ -1,0 +1,15 @@
+export 'package:cool_shop/screens/catalog_screen/catalog_widget.dart';
+export 'package:cool_shop/screens/catalog_screen/catalog_wm.dart';
+export 'package:cool_shop/screens/profile/auth_screen/auth_widget.dart';
+export 'package:cool_shop/screens/profile/auth_screen/auth_wm.dart';
+export 'package:cool_shop/screens/profile/register_screen/register_widget.dart';
+export 'package:cool_shop/screens/profile/register_screen/register_wm.dart';
+export 'package:cool_shop/screens/profile/auth_part2_screen/auth_part2_widget.dart';
+export 'package:cool_shop/screens/profile/auth_part2_screen/auth_part2_wm.dart';
+export 'package:cool_shop/screens/profile/profile_main_screen/profile_main_widget.dart';
+export 'package:cool_shop/screens/profile/profile_main_screen/profile_main_wm.dart';
+export 'package:cool_shop/screens/main_screen_widget.dart';
+export 'package:cool_shop/screens/favorite_screen/favorite_widget.dart';
+export 'package:cool_shop/screens/favorite_screen/favorite_wm.dart';
+export 'package:cool_shop/screens/cart_screen/cart_widget.dart';
+export 'package:cool_shop/screens/cart_screen/cart_wm.dart';
