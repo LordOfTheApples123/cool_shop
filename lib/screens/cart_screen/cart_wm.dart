@@ -28,6 +28,9 @@ abstract class ICartWidgetModel extends IWidgetModel
   void addToCart(int index) {}
 
   void onFavorite(bool liked, int id) {}
+
+  void onOrder() {
+  }
 }
 
 CartWidgetModel defaultCartWidgetModelFactory(BuildContext context) {
@@ -87,5 +90,10 @@ class CartWidgetModel extends WidgetModel<CartWidget, CartModel>
     }
 
     service.updateCart(id, count);
+  }
+
+  @override
+  void onOrder() {
+    // TODO: implement onOrder
   }
 }

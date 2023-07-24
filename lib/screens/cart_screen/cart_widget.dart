@@ -139,7 +139,7 @@ class _ESBWithLike extends StatelessWidget {
                     onMinus: productCount == 1
                         ? null
                         : () {
-                            wm.updateCart(productCount, product.id);
+                            wm.updateCart(productCount - 1, product.id);
                           },
                     onFavorite: null,
                     onDelete: () {
@@ -151,6 +151,7 @@ class _ESBWithLike extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: _BottomPriceBar(
+                  onTap: wm.onOrder,
                   price: cart.price,
                   discount:
                       localDiscount == 0 ? null : localDiscount.toString(),
@@ -204,7 +205,7 @@ class _ESBWithLike extends StatelessWidget {
                     isLiked: liked,
                     cartProduct: cartProducts[index],
                     onPlus: () {
-                      wm.updateCart(productCount + 1, product.id);
+                      wm.addToCart(product.id);
                     },
                     onMinus: productCount == 1
                         ? null
@@ -223,6 +224,7 @@ class _ESBWithLike extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: _BottomPriceBar(
+                  onTap: wm.onOrder,
                   price: cart.price,
                   discount:
                       localDiscount == 0 ? null : localDiscount.toString(),
@@ -235,11 +237,12 @@ class _ESBWithLike extends StatelessWidget {
 }
 
 class _BottomPriceBar extends StatelessWidget {
-  const _BottomPriceBar({Key? key, required this.price, this.discount})
+  const _BottomPriceBar({Key? key, required this.price, this.discount, required this.onTap})
       : super(key: key);
 
   final String price;
   final String? discount;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +283,22 @@ class _BottomPriceBar extends StatelessWidget {
                       ),
                   ],
                 ),
-              )
+              ),
+              Expanded(child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  height: 50,
+                  child: FilledButton(
+                    onPressed: onTap,
+                    child: Center(
+                      child: Text(
+                        "ОФОРМИТЬ ЗАКАЗ",
+                        style: textTheme.labelMedium,
+                      ),
+                    ),
+                  ),
+                ),
+              ))
             ],
           ),
         ),
