@@ -145,6 +145,7 @@ class BufferServiceWrapper {
     final cart = cartState.value?.data;
     final products = cart?.products ?? [];
 
+
     final int operation = count - preview.count;
 
     final newProducts = products

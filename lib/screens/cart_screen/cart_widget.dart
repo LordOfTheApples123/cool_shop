@@ -164,6 +164,7 @@ class _ESBWithLike extends StatelessWidget {
             );
           },
         ),
+
         Align(
           alignment: Alignment.bottomCenter,
           child: _BottomPriceBar(
