@@ -1,6 +1,7 @@
 import 'package:cool_shop/data/model/product/product.dart';
 import 'package:cool_shop/internal/app_components.dart';
 import 'package:cool_shop/internal/use_case/auth_use_case.dart';
+import 'package:cool_shop/internal/use_case/buffer_service_wrapper.dart';
 import 'package:cool_shop/internal/use_case/product_service.dart';
 import 'package:cool_shop/screens/utils/snack_bar_utl.dart';
 import 'package:cool_shop/screens/utils/theme_provider.dart';
@@ -17,11 +18,11 @@ abstract class ICatalogWidgetModel extends IWidgetModel implements IThemeProvide
 
   Future<(List<Product> content, bool isMore)> loadMore(_);
 
-  ProductService get productService;
+  BufferServiceWrapper get serviceWrapper;
 
-  void onFavorite(bool like, int id);
+  Future<void> onFavorite(bool like, int id, Product preview);
 
-  void onBasket(int id) {}
+  void onBasket(int id, Product preview) {}
 }
 
 CatalogWidgetModel defaultCatalogWidgetModelFactory(BuildContext context) {
@@ -33,8 +34,6 @@ CatalogWidgetModel defaultCatalogWidgetModelFactory(BuildContext context) {
   );
 }
 
-// TODO: cover with documentation
-/// Default widget model for CatalogWidget
 class CatalogWidgetModel extends WidgetModel<CatalogWidget, CatalogModel>
     with ThemeProvider
     implements ICatalogWidgetModel {
@@ -52,31 +51,30 @@ class CatalogWidgetModel extends WidgetModel<CatalogWidget, CatalogModel>
     }
   }
   @override
-  void onFavorite(bool like, int id){
+  Future<void> onFavorite(bool like, int id, Product preview) async {
 
     debugPrint("onfav");
     if(like){
-      productService.removeFromFav(id);
+      await serviceWrapper.removeFromFav(id, preview);
       return;
     }
 
-    productService.addToFav(id);
+    await serviceWrapper.addToFav(id, preview);
   }
 
 
 
   @override
-  //force and wrap оправдан!
-  ProductService productService = AppComponents().service!;
+  BufferServiceWrapper serviceWrapper = AppComponents().serviceWrapper;
 
   @override
   AuthUseCase auth = AppComponents().authUseCase;
 
   @override
-  void onBasket(int id) {
+  void onBasket(int id, Product product) {
 
     debugPrint("onbasket");
-    productService.addToCart(id);
+    serviceWrapper.addToCart(id, product);
   }
 
   @override

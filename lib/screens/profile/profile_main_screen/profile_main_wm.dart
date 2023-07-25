@@ -27,8 +27,6 @@ ProfileMainWidgetModel defaultProfileMainWidgetModelFactory(
   );
 }
 
-// TODO: cover with documentation
-/// Default widget model for ProfileMainWidget
 class ProfileMainWidgetModel
     extends WidgetModel<ProfileMainWidget, ProfileMainModel>
     with ThemeProvider
@@ -46,8 +44,7 @@ class ProfileMainWidgetModel
   }
 
   @override
-  // TODO: implement auth
-  AuthUseCase get auth => context.read();
+  AuthUseCase auth = AppComponents().authUseCase;
 
 
 }

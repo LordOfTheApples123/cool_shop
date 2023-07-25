@@ -22,56 +22,57 @@ class CartWidget extends ElementaryWidget<ICartWidgetModel> {
         automaticallyImplyLeading: false,
       ),
       body: StreamBuilder<bool>(
-          stream: wm.auth.stream,
-          builder: (context, snapshot) {
-            if (!wm.auth.isAuthorized) {
-              return CenterButtonWithInfo(
-                infoText: "Авторизуйтесь, чтобы добавлять в корзину",
-                buttonText: "ВХОД / РЕГИСТРАЦИЯ",
-                onTap: wm.navigateToProfile,
-              );
-            }
-
-            return EntityStateNotifierBuilder(
-              listenableEntityState: wm.service.cartState,
-              errorBuilder: (context, __, ___) {
-                return Center(
-                  child: Text(
-                    "Сервер поел и спит",
-                    style: wm.textTheme.titleSmall,
-                  ),
-                );
-              },
-              loadingBuilder: (context, value) {
-                final cart = value;
-                final products = cart?.products ?? [];
-
-                if (products.isEmpty || cart == null) {
-                  return CenterButtonWithInfo(
-                    infoText: "В вашей корзине пусто",
-                    buttonText: "Перейти к покупкам",
-                    onTap: wm.navigateToCatalog,
-                  );
-                }
-
-                return _ESBWithLike(cart: cart, wm: wm);
-              },
-              builder: (context, value) {
-                final cart = value;
-                final products = cart?.products ?? [];
-
-                if (products.isEmpty || cart == null) {
-                  return CenterButtonWithInfo(
-                    infoText: "В вашей корзине пусто",
-                    buttonText: "Перейти к покупкам",
-                    onTap: wm.navigateToCatalog,
-                  );
-                }
-
-                return _ESBWithLike(cart: cart, wm: wm);
-              },
+        stream: wm.auth.stream,
+        builder: (context, snapshot) {
+          if (!wm.auth.isAuthorized) {
+            return CenterButtonWithInfo(
+              infoText: "Авторизуйтесь, чтобы добавлять в корзину",
+              buttonText: "ВХОД / РЕГИСТРАЦИЯ",
+              onTap: wm.navigateToProfile,
             );
-          }),
+          }
+
+          return EntityStateNotifierBuilder(
+            listenableEntityState: wm.serviceWrapper.cartState,
+            errorBuilder: (context, __, ___) {
+              return Center(
+                child: Text(
+                  "Сервер поел и спит",
+                  style: wm.textTheme.titleSmall,
+                ),
+              );
+            },
+            loadingBuilder: (context, value) {
+              final cart = value;
+              final products = cart?.products ?? [];
+
+              if (products.isEmpty || cart == null) {
+                return CenterButtonWithInfo(
+                  infoText: "В вашей корзине пусто",
+                  buttonText: "Перейти к покупкам",
+                  onTap: wm.navigateToCatalog,
+                );
+              }
+
+              return _ESBWithLike(cart: cart, wm: wm);
+            },
+            builder: (context, value) {
+              final cart = value;
+              final products = cart?.products ?? [];
+
+              if (products.isEmpty || cart == null) {
+                return CenterButtonWithInfo(
+                  infoText: "В вашей корзине пусто",
+                  buttonText: "Перейти к покупкам",
+                  onTap: wm.navigateToCatalog,
+                );
+              }
+
+              return _ESBWithLike(cart: cart, wm: wm);
+            },
+          );
+        },
+      ),
     );
   }
 }
@@ -89,155 +90,89 @@ class _ESBWithLike extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cartProducts = cart.products;
-    return EntityStateNotifierBuilder(
-        listenableEntityState: wm.service.favState,
-        loadingBuilder: (context, value) {
-          final favs = value ?? [];
-          final favIds = favs.map((fav) => fav.id).toList();
-          int localDiscount = 0;
+    int localDiscount = 0;
 
-          for (CartProduct cartProduct in cartProducts) {
-            final forProduct = cartProduct.product;
-            final oldPrice = forProduct.oldPrice;
-            if (oldPrice != null &&
-                oldPrice.isNotEmpty &&
-                oldPrice != "0.0000") {
-              localDiscount += double.parse(oldPrice).floor();
-            }
-          }
-          return Stack(
-            children: [
-              ListView.separated(
-                padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-                separatorBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    child: Divider(
-                      thickness: 1,
-                      color: wm.colorScheme.primaryContainer,
-                    ),
-                  );
-                },
-                itemCount: cartProducts.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == cartProducts.length) {
-                    return const SizedBox(
-                      height: 140,
-                    );
-                  }
-
-                  final liked = favIds.contains(cartProducts[index].product.id);
-                  final productCount = cartProducts[index].count;
-                  final product = cartProducts[index].product;
-
-                  return CartProductCard(
-                    isLiked: liked,
-                    cartProduct: cartProducts[index],
-                    onPlus: () {
-                      wm.addToCart(product.id);
-                    },
-                    onMinus: productCount == 1
-                        ? null
-                        : () {
-                            wm.updateCart(productCount - 1, product.id);
-                          },
-                    onFavorite: null,
-                    onDelete: () {
-                      wm.deleteFromCart(product.id);
-                    },
-                  );
-                },
+    //я не знаю как это в map запихнуть
+    for (CartProduct cartProduct in cartProducts) {
+      final forProduct = cartProduct.product;
+      final oldPrice = forProduct.oldPrice;
+      final currPrice = forProduct.price ?? "0";
+      if (oldPrice != null && oldPrice.isNotEmpty && oldPrice != "0.0000") {
+        localDiscount +=
+            double.parse(oldPrice).floor() - double.parse(currPrice).floor();
+      }
+    }
+    return Stack(
+      children: [
+        ListView.separated(
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+          separatorBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              child: Divider(
+                color: wm.colorScheme.primaryContainer,
+                thickness: 1,
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: _BottomPriceBar(
-                  onTap: wm.onOrder,
-                  price: cart.price,
-                  discount:
-                      localDiscount == 0 ? null : localDiscount.toString(),
-                ),
-              )
-            ],
-          );
-        },
-        builder: (context, value) {
-          final favs = value ?? [];
-          final favIds = favs.map((fav) => fav.id).toList();
-
-          int localDiscount = 0;
-
-          for (CartProduct cartProduct in cartProducts) {
-            final forProduct = cartProduct.product;
-            final oldPrice = forProduct.oldPrice;
-            if (oldPrice != null &&
-                oldPrice.isNotEmpty &&
-                oldPrice != "0.0000") {
-              localDiscount += double.parse(oldPrice).floor();
+            );
+          },
+          itemCount: cartProducts.length + 1,
+          itemBuilder: (context, index) {
+            if (index == cartProducts.length) {
+              return const SizedBox(
+                height: 140,
+              );
             }
-          }
 
-          return Stack(
-            children: [
-              ListView.separated(
-                padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-                separatorBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    child: Divider(
-                      color: wm.colorScheme.primaryContainer,
-                      thickness: 1,
-                    ),
-                  );
-                },
-                itemCount: cartProducts.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == cartProducts.length) {
-                    return const SizedBox(
-                      height: 140,
-                    );
-                  }
+            final favIds = wm.serviceWrapper.favIds;
+            final product = cartProducts[index].product;
+            final liked = favIds.contains(product.id);
+            final productCount = cartProducts[index].count;
 
-                  final liked = favIds.contains(cartProducts[index].product.id);
-                  final productCount = cartProducts[index].count;
-                  final product = cartProducts[index].product;
-
-                  return CartProductCard(
-                    isLiked: liked,
-                    cartProduct: cartProducts[index],
-                    onPlus: () {
-                      wm.addToCart(product.id);
-                    },
-                    onMinus: productCount == 1
-                        ? null
-                        : () {
-                            wm.updateCart(productCount - 1, product.id);
-                          },
-                    onFavorite: () {
-                      wm.onFavorite(liked, product.id);
-                    },
-                    onDelete: () {
-                      wm.deleteFromCart(product.id);
-                    },
-                  );
-                },
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: _BottomPriceBar(
-                  onTap: wm.onOrder,
-                  price: cart.price,
-                  discount:
-                      localDiscount == 0 ? null : localDiscount.toString(),
-                ),
-              )
-            ],
-          );
-        });
+            return EntityStateNotifierBuilder(
+              listenableEntityState: wm.serviceWrapper.favState,
+              loadingBuilder: (context, value) {
+                return CartProductCard(
+                  isLiked: liked,
+                  cartProduct: cartProducts[index],
+                  onPlus: () async => await wm.addToCart(product.id, product),
+                  onMinus: productCount == 1
+                      ? null
+                      : () async => await wm.updateCart(productCount - 1, product.id, cartProducts[index]),
+                  onFavorite: () async => await wm.onFavorite(liked, product.id, product),
+                  onDelete: () async => await wm.deleteFromCart(product.id, cartProducts[index]),
+                );
+              },
+              builder: (context, value) {
+                return CartProductCard(
+                  isLiked: liked,
+                  cartProduct: cartProducts[index],
+                  onPlus: () async => await wm.addToCart(product.id, product),
+                  onMinus: productCount == 1
+                      ? null
+                      : () async => await wm.updateCart(productCount - 1, product.id, cartProducts[index]),
+                  onFavorite: () async => await wm.onFavorite(liked, product.id, product),
+                  onDelete: () async => await wm.deleteFromCart(product.id, cartProducts[index]),
+                );
+              },
+            );
+          },
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: _BottomPriceBar(
+            onTap: wm.onOrder,
+            price: cart.price,
+            discount: localDiscount == 0 ? null : localDiscount.toString(),
+          ),
+        )
+      ],
+    );
   }
 }
 
 class _BottomPriceBar extends StatelessWidget {
-  const _BottomPriceBar({Key? key, required this.price, this.discount, required this.onTap})
+  const _BottomPriceBar(
+      {Key? key, required this.price, this.discount, required this.onTap})
       : super(key: key);
 
   final String price;
@@ -284,7 +219,8 @@ class _BottomPriceBar extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(child: Center(
+              Expanded(
+                  child: Center(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   height: 50,

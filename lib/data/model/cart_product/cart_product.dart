@@ -7,6 +7,7 @@ part 'cart_product.g.dart';
 @Freezed(
   fromJson: true,
   toJson: false,
+  equal: true,
 )
 class CartProduct with _$CartProduct {
   const factory CartProduct({

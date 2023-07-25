@@ -24,15 +24,14 @@ class FavoriteWidget extends ElementaryWidget<IFavoriteWidgetModel> {
         stream: wm.auth.stream,
         builder: (context, __) {
           if (!wm.auth.isAuthorized) {
-            return  CenterButtonWithInfo(
+            return CenterButtonWithInfo(
               infoText: "Чтобы добавлять в избранное, авторизуйтесь",
               buttonText: "ВХОД / РЕГИСТРАЦИЯ",
               onTap: wm.navigateToProfile,
-            );;
+            );
           }
-
           return EntityStateNotifierBuilder(
-            listenableEntityState: wm.service.favState,
+            listenableEntityState: wm.serviceWrapper.favState,
             errorBuilder: (context, __, ___) {
               return Center(
                 child: Text(
@@ -59,22 +58,30 @@ class FavoriteWidget extends ElementaryWidget<IFavoriteWidgetModel> {
                   childAspectRatio: 4 / 5,
                 ),
                 itemBuilder: (context, index) {
-                  final favs = value ?? [];
-                  final favIds = favs.map((fav) => fav.id).toList();
+                  final favIds = wm.serviceWrapper.favIds;
                   final liked = favIds.contains(products[index].id);
 
                   return ProductCardWidget(
-                      product: products[index],
-                      selected: liked,
-                      onFavourite: null,
-                      onBasket: () {
-                        wm.onBasket(products[index].id);
-                      });
+                    product: products[index],
+                    selected: liked,
+                    onFavourite: () async => await wm.onFavorite(
+                        products[index].id, products[index]),
+                    onBasket: () async =>
+                        await wm.onBasket(products[index].id, products[index]),
+                  );
                 },
               );
             },
             builder: (context, value) {
               final products = value ?? [];
+
+              if (products.isEmpty) {
+                return CenterButtonWithInfo(
+                  infoText: "В вашем избранном пока ничего нет",
+                  buttonText: "ПЕРЕЙТИ К ПОКУПКАМ",
+                  onTap: wm.navigateToCatalog,
+                );
+              }
               return GridView.builder(
                 itemCount: products.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -82,19 +89,17 @@ class FavoriteWidget extends ElementaryWidget<IFavoriteWidgetModel> {
                   childAspectRatio: 4 / 5,
                 ),
                 itemBuilder: (context, index) {
-                  final favs = value ?? [];
-                  final favIds = favs.map((fav) => fav.id).toList();
+                  final favIds = wm.serviceWrapper.favIds;
                   final liked = favIds.contains(products[index].id);
 
                   return ProductCardWidget(
-                      product: products[index],
-                      selected: liked,
-                      onFavourite: () {
-                        wm.onFavorite(products[index].id);
-                      },
-                      onBasket: () {
-                        wm.onBasket(products[index].id);
-                      });
+                    product: products[index],
+                    selected: liked,
+                    onFavourite: () async => await wm.onFavorite(
+                        products[index].id, products[index]),
+                    onBasket: () async =>
+                        await wm.onBasket(products[index].id, products[index]),
+                  );
                 },
               );
             },
@@ -104,4 +109,3 @@ class FavoriteWidget extends ElementaryWidget<IFavoriteWidgetModel> {
     );
   }
 }
-

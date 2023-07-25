@@ -11,6 +11,7 @@ part 'product.freezed.dart';
 @Freezed(
   fromJson: true,
   toJson: false,
+  equal: true
 )
 class Product with _$Product {
   const factory Product({
@@ -25,7 +26,6 @@ class Product with _$Product {
     @JsonKey(name: "reviews_count") int? reviewsCount,
     required String brand,
     required List<Badge> badges,
-    bool? like,
   }) = _Product;
 
   factory Product.fromJson(Map<String, dynamic> json) =>_$_Product(
@@ -49,6 +49,7 @@ class Product with _$Product {
 @Freezed(
   fromJson: true,
   toJson: false,
+  equal: true,
 )
 class Badge with _$Badge {
   const factory Badge({

@@ -20,7 +20,6 @@ _$_Product _$$_ProductFromJson(Map<String, dynamic> json) => _$_Product(
       badges: (json['badges'] as List<dynamic>)
           .map((e) => Badge.fromJson(e as Map<String, dynamic>))
           .toList(),
-      like: json['like'] as bool?,
     );
 
 _$_Badge _$$_BadgeFromJson(Map<String, dynamic> json) => _$_Badge(

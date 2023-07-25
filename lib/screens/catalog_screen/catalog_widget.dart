@@ -24,6 +24,12 @@ class CatalogWidget extends ElementaryWidget<ICatalogWidgetModel> {
         paginationCallback: wm.loadMore,
         builder: (context, controller, snapshot) {
           final products = snapshot.data ?? <Product>[];
+
+          if (products.isEmpty) {
+            const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
           return GridView.builder(
             controller: controller,
             itemCount: products.length,
@@ -36,46 +42,41 @@ class CatalogWidget extends ElementaryWidget<ICatalogWidgetModel> {
                 stream: wm.auth.stream,
                 builder: (context, snapshot) {
                   return EntityStateNotifierBuilder(
-                    listenableEntityState: wm.productService.favState,
-                    errorBuilder: (context, __, ___) {
-                      return Center(
-                        child: Text(
-                          "Сервер поел и спит",
-                          style: wm.textTheme.titleSmall,
-                        ),
+                    listenableEntityState: wm.serviceWrapper.favState,
+                    loadingBuilder: (context, value) {
+
+                      final favIds = wm.serviceWrapper.favIds;
+                      final liked = favIds.contains(products[index].id);
+
+                      return ProductCardWidget(
+                        product: products[index],
+                        selected: liked,
+                        onFavourite: !wm.auth.isAuthorized
+                            ? wm.showSnackBar
+                            : () => wm.onFavorite(
+                            liked, products[index].id, products[index]),
+                        onBasket: !wm.auth.isAuthorized
+                            ? wm.showSnackBar
+                            : () => wm.onBasket(
+                            products[index].id, products[index]),
                       );
                     },
-                    loadingBuilder: (context, value) {
-                      final favs = value ?? [];
-                      final favIds = favs.map((fav) => fav.id).toList();
-                      final liked = favIds.contains(products[index].id);
-
-                      return ProductCardWidget(
-                          product: products[index],
-                          selected: liked,
-                          onFavourite: null,
-                          onBasket: () {
-                            wm.onBasket(products[index].id);
-                          });
-                    },
                     builder: (context, value) {
-                      final favs = value ?? [];
-                      final favIds = favs.map((fav) => fav.id).toList();
+                      final favIds = wm.serviceWrapper.favIds;
                       final liked = favIds.contains(products[index].id);
 
                       return ProductCardWidget(
-                          product: products[index],
-                          selected: liked,
-                          onFavourite: !wm.auth.isAuthorized
-                              ? wm.showSnackBar
-                              : () {
-                                  wm.onFavorite(liked, products[index].id);
-                                },
-                          onBasket: !wm.auth.isAuthorized
-                              ? wm.showSnackBar
-                              : () {
-                                  wm.onBasket(products[index].id);
-                                });
+                        product: products[index],
+                        selected: liked,
+                        onFavourite: !wm.auth.isAuthorized
+                            ? wm.showSnackBar
+                            : () async => await wm.onFavorite(
+                                liked, products[index].id, products[index]),
+                        onBasket: !wm.auth.isAuthorized
+                            ? wm.showSnackBar
+                            : () async => wm.onBasket(
+                                products[index].id, products[index]),
+                      );
                     },
                   );
                 },
