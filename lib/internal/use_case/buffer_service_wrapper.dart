@@ -249,6 +249,7 @@ class BufferServiceWrapper {
     favState.loading();
     cartState.loading();
     favState.content([]);
+    favIds.clear();
     cartState.content(const CalculatedCart(price: "0", count: 0, products: []));
   }
 }
