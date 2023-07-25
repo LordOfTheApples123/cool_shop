@@ -73,6 +73,21 @@ class BufferServiceWrapper {
   }
 
   Future<void> _resolve(List<FutureCallback?> list) async {
+
+    //здесь немного жиденько
+    //просто вызываем запросы
+    //огромный простор для оптимизации:
+    //-не вызывать, исключающие друг друга запросы
+    // (addToFavorite, removeFromFavorite)
+    //-многочисленное обновление товара, заменить на один put
+    //запрос с финальным count
+    //но дедлайн был 6 часов назад :(
+
+    //ещё было бы классно, если бы апи, поддерживало добавление списка
+    //id вместо одного id, и можно было бы одним большим запросом, добавить
+    //10 продуктов в избранное
+
+
     for (FutureCallback? request in list) {
       await request?.call();
     }
@@ -97,10 +112,14 @@ class BufferServiceWrapper {
         ?.count;
 
     if (initCount != null) {
-      await updateCart(id, CartProduct(count: initCount + 1, product: preview),
-          initCount + 1);
+      await updateCart(
+        id: id,
+        count: initCount + 1,
+        preview: CartProduct(count: initCount + 1, product: preview),
+      );
       return;
     }
+
     products.add(CartProduct(count: 1, product: preview));
 
     //флюттер это про бэкенд
@@ -141,10 +160,12 @@ class BufferServiceWrapper {
   }
 
   ///-1 +1
-  Future<void> updateCart(int id, CartProduct preview, int count) async {
+  Future<void> updateCart(
+      {required int id,
+      required CartProduct preview,
+      required int count}) async {
     final cart = cartState.value?.data;
     final products = cart?.products ?? [];
-
 
     final int operation = count - preview.count;
 
@@ -153,6 +174,10 @@ class BufferServiceWrapper {
             ? cartProduct.copyWith(count: count)
             : cartProduct)
         .toList();
+
+    for (CartProduct element in newProducts) {
+      debugPrint((element.count).toString());
+    }
 
     final price = cart?.price ?? "0";
     final finalPrice = double.parse(price) +
@@ -163,6 +188,8 @@ class BufferServiceWrapper {
             products: newProducts,
             count: cart.count + operation) ??
         const CalculatedCart(price: "0", count: 0, products: []);
+
+    debugPrint(newCart.count.toString());
 
     cartState.loading(newCart);
     cartState.content(newCart);

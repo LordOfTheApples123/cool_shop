@@ -28,7 +28,7 @@ abstract class ICartWidgetModel extends IWidgetModel
 
   Future<void> deleteFromCart(int index, CartProduct preview);
 
-  Future<void> updateCart(int count, int id, CartProduct preview);
+  Future<void> updateCart({required int count, required int id, required CartProduct preview});
 
   Future<void> addToCart(int index, Product preview);
 
@@ -95,12 +95,12 @@ class CartWidgetModel extends WidgetModel<CartWidget, CartModel>
   }
 
   @override
-  Future<void> updateCart(int count, int id, CartProduct preview) async {
+  Future<void> updateCart({required int count, required int id, required CartProduct preview}) async {
     if(count == 0){
       return;
     }
 
-    await serviceWrapper.updateCart(id, preview, count);
+    await serviceWrapper.updateCart(id: id, preview: preview, count: count);
   }
 
   @override

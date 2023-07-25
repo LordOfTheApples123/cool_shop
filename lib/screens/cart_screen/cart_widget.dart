@@ -123,38 +123,61 @@ class _ESBWithLike extends StatelessWidget {
               );
             }
 
-            final favIds = wm.serviceWrapper.favIds;
-            final product = cartProducts[index].product;
-            final liked = favIds.contains(product.id);
-            final productCount = cartProducts[index].count;
-
             return EntityStateNotifierBuilder(
               listenableEntityState: wm.serviceWrapper.favState,
               loadingBuilder: (context, value) {
-                return CartProductCard(
-                  isLiked: liked,
-                  cartProduct: cartProducts[index],
-                  onPlus: () async => await wm.addToCart(product.id, product),
-                  onMinus: productCount == 1
-                      ? null
-                      : () async => await wm.updateCart(
-                          productCount - 1, product.id, cartProducts[index]),
-                  onFavorite: () async =>
-                      await wm.onFavorite(liked, product.id, product),
-                  onDelete: () async =>
-                      await wm.deleteFromCart(product.id, cartProducts[index]),
-                );
-              },
-              builder: (context, value) {
+                final favIds = wm.serviceWrapper.favIds;
+                final product = cartProducts[index].product;
+                final liked = favIds.contains(product.id);
+                final productCount = cartProducts[index].count;
+
                 return CartProductCard(
                   isLiked: liked,
                   cartProduct: cartProducts[index],
                   onPlus: () async => await wm.updateCart(
-                      product.id, productCount + 1, cartProducts[index]),
+                    id: product.id,
+                    count: productCount + 1,
+                    preview: cartProducts[index],
+                  ),
                   onMinus: productCount == 1
                       ? null
                       : () async => await wm.updateCart(
-                          productCount - 1, product.id, cartProducts[index]),
+                            id: product.id,
+                            count: productCount - 1,
+                            preview: cartProducts[index],
+                          ),
+                  onFavorite: () async => await wm.onFavorite(
+                    liked,
+                    product.id,
+                    product,
+                  ),
+                  onDelete: () async => await wm.deleteFromCart(
+                    product.id,
+                    cartProducts[index],
+                  ),
+                );
+              },
+              builder: (context, value) {
+                final favIds = wm.serviceWrapper.favIds;
+                final product = cartProducts[index].product;
+                final liked = favIds.contains(product.id);
+                final productCount = cartProducts[index].count;
+
+                return CartProductCard(
+                  isLiked: liked,
+                  cartProduct: cartProducts[index],
+                  onPlus: () async => await wm.updateCart(
+                    id: product.id,
+                    count: productCount + 1,
+                    preview: cartProducts[index],
+                  ),
+                  onMinus: productCount == 1
+                      ? null
+                      : () async => await wm.updateCart(
+                            id: product.id,
+                            count: productCount - 1,
+                            preview: cartProducts[index],
+                          ),
                   onFavorite: () async =>
                       await wm.onFavorite(liked, product.id, product),
                   onDelete: () async =>
@@ -164,7 +187,6 @@ class _ESBWithLike extends StatelessWidget {
             );
           },
         ),
-
         Align(
           alignment: Alignment.bottomCenter,
           child: _BottomPriceBar(
