@@ -1,5 +1,10 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:cool_shop/data/model/cart_product/cart_product.dart';
+import 'package:cool_shop/data/model/product/product.dart';
 import 'package:cool_shop/internal/app_components.dart';
+import 'package:cool_shop/internal/navigation/app_router.dart';
 import 'package:cool_shop/internal/use_case/auth_use_case.dart';
+import 'package:cool_shop/internal/use_case/buffer_service_wrapper.dart';
 import 'package:cool_shop/internal/use_case/product_service.dart';
 import 'package:cool_shop/screens/utils/theme_provider.dart';
 import 'package:elementary/elementary.dart';
@@ -10,7 +15,7 @@ import 'cart_widget.dart';
 
 abstract class ICartWidgetModel extends IWidgetModel
     implements IThemeProvider {
-  ProductService get service;
+  BufferServiceWrapper get serviceWrapper;
 
   AuthUseCase get auth;
 
@@ -21,16 +26,15 @@ abstract class ICartWidgetModel extends IWidgetModel
   }
 
 
-  void deleteFromCart(int index) {}
+  Future<void> deleteFromCart(int index, CartProduct preview);
 
-  void updateCart(int count, int id) {}
+  Future<void> updateCart(int count, int id, CartProduct preview);
 
-  void addToCart(int index) {}
+  Future<void> addToCart(int index, Product preview);
 
-  void onFavorite(bool liked, int id) {}
+  Future<void> onFavorite(bool liked, int id, Product product);
 
-  void onOrder() {
-  }
+  void onOrder();
 }
 
 CartWidgetModel defaultCartWidgetModelFactory(BuildContext context) {
@@ -39,61 +43,71 @@ CartWidgetModel defaultCartWidgetModelFactory(BuildContext context) {
   ));
 }
 
-// TODO: cover with documentation
-/// Default widget model for CartWidget
 class CartWidgetModel extends WidgetModel<CartWidget, CartModel>
     with ThemeProvider
     implements ICartWidgetModel {
   CartWidgetModel(CartModel model) : super(model);
 
-  @override
-  //force and wrap оправдан!
-  ProductService service = AppComponents().service!;
 
   @override
   AuthUseCase auth = AppComponents().authUseCase;
 
   @override
   void navigateToCatalog() {
-    // TODO: implement navigateToCatalog
+    context.router.navigate(
+      CatalogTab(
+        children: [
+          CatalogRoute(),
+        ],
+      ),
+    );
   }
 
   @override
   void navigateToProfile() {
-    // TODO: implement navigateToProfile
+    context.router.navigate(
+      ProfileTab(
+        children: [
+          ProfileMainRoute(),
+        ],
+      ),
+    );
   }
 
   @override
-  void addToCart(int id) {
-    service.addToCart(id);
+  Future<void> addToCart(int id, Product preview) async {
+    await serviceWrapper.addToCart(id, preview);
   }
 
   @override
-  void deleteFromCart(int id) {
-    service.removeFromCart(id);
+  Future<void> deleteFromCart(int id, CartProduct preview) async {
+    await serviceWrapper.removeFromCart(id, preview);
   }
 
   @override
-  void onFavorite(bool liked, int id) {
+  Future<void> onFavorite(bool liked, int id, Product preview) async {
     if(liked){
-      service.removeFromFav(id);
+      await serviceWrapper.removeFromFav(id, preview);
       return;
     }
 
-    service.addToFav(id);
+    await serviceWrapper.addToFav(id, preview);
   }
 
   @override
-  void updateCart(int count, int id) {
-    if(count == 1){
+  Future<void> updateCart(int count, int id, CartProduct preview) async {
+    if(count == 0){
       return;
     }
 
-    service.updateCart(id, count);
+    await serviceWrapper.updateCart(id, preview, count);
   }
 
   @override
   void onOrder() {
     // TODO: implement onOrder
   }
+
+  @override
+  BufferServiceWrapper  serviceWrapper = AppComponents().serviceWrapper;
 }

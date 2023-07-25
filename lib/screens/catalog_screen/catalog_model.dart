@@ -19,14 +19,9 @@ class CatalogModel extends ElementaryModel {
       }
       final response = await client.getPage(_page.toString());
 
-      final fav = await client.getFav();
 
-      //с id удобнее работать
-      final favIds = fav.map((product) => product.id);
       //я не понимаю почему response.results это List<dynamic>
       final products = response.results as List<Product>;
-      products.map(
-          (product) => product.copyWith(like: favIds.contains(product.id)));
       isMore = response.next != null;
       _page++;
       return (

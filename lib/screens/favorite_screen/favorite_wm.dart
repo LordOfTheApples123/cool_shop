@@ -1,5 +1,9 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:cool_shop/data/model/product/product.dart';
 import 'package:cool_shop/internal/app_components.dart';
+import 'package:cool_shop/internal/navigation/app_router.dart';
 import 'package:cool_shop/internal/use_case/auth_use_case.dart';
+import 'package:cool_shop/internal/use_case/buffer_service_wrapper.dart';
 import 'package:cool_shop/internal/use_case/product_service.dart';
 import 'package:cool_shop/screens/utils/snack_bar_utl.dart';
 import 'package:cool_shop/screens/utils/theme_provider.dart';
@@ -9,20 +13,19 @@ import 'package:provider/provider.dart';
 import 'favorite_model.dart';
 import 'favorite_widget.dart';
 
-abstract class IFavoriteWidgetModel extends IWidgetModel implements IThemeProvider{
+abstract class IFavoriteWidgetModel extends IWidgetModel
+    implements IThemeProvider {
   AuthUseCase get auth;
 
-  ProductService get service;
-
+  BufferServiceWrapper get serviceWrapper;
 
   void navigateToProfile();
 
-  void onBasket(int id) {}
+  Future<void> onBasket(int id, Product preview);
 
-  void onFavorite(int id) {}
+  Future<void> onFavorite(int id, Product preview);
 
-  void navigateToCatalog() {
-  }
+  void navigateToCatalog() {}
 }
 
 FavoriteWidgetModel defaultFavoriteWidgetModelFactory(BuildContext context) {
@@ -31,7 +34,6 @@ FavoriteWidgetModel defaultFavoriteWidgetModelFactory(BuildContext context) {
       errorHandler: context.read(),
     ),
   );
-
 }
 
 // TODO: cover with documentation
@@ -39,35 +41,44 @@ FavoriteWidgetModel defaultFavoriteWidgetModelFactory(BuildContext context) {
 class FavoriteWidgetModel extends WidgetModel<FavoriteWidget, FavoriteModel>
     with ThemeProvider
     implements IFavoriteWidgetModel {
-
   FavoriteWidgetModel(FavoriteModel model) : super(model);
 
   @override
   AuthUseCase auth = AppComponents().authUseCase;
 
-  @override
-  //force and wrap оправдан!
-  ProductService service = AppComponents().service!;
 
   @override
   void navigateToProfile() {
-    // TODO: implement navigateToProfile
+    context.router.navigate(
+      ProfileTab(
+        children: [
+          ProfileMainRoute(),
+        ],
+      ),
+    );
   }
 
   @override
-  void onBasket(int id) {
-    service.addToCart(id);
+  Future<void> onBasket(int id, Product preview) async {
+    await serviceWrapper.addToCart(id, preview);
   }
 
   @override
-  void onFavorite(int id) {
-    service.removeFromFav(id);
+  Future<void> onFavorite(int id, Product preview) async {
+    await serviceWrapper.removeFromFav(id, preview);
   }
 
   @override
   void navigateToCatalog() {
-    // TODO: implement navigateToCatalog
+    context.router.navigate(
+      CatalogTab(
+        children: [
+          CatalogRoute(),
+        ],
+      ),
+    );
   }
 
-
+  @override
+  BufferServiceWrapper serviceWrapper = AppComponents().serviceWrapper;
 }

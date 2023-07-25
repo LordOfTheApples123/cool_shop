@@ -33,7 +33,6 @@ mixin _$Product {
   int? get reviewsCount => throw _privateConstructorUsedError;
   String get brand => throw _privateConstructorUsedError;
   List<Badge> get badges => throw _privateConstructorUsedError;
-  bool? get like => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $ProductCopyWith<Product> get copyWith => throw _privateConstructorUsedError;
@@ -55,8 +54,7 @@ abstract class $ProductCopyWith<$Res> {
       double? rating,
       @JsonKey(name: "reviews_count") int? reviewsCount,
       String brand,
-      List<Badge> badges,
-      bool? like});
+      List<Badge> badges});
 }
 
 /// @nodoc
@@ -83,7 +81,6 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
     Object? reviewsCount = freezed,
     Object? brand = null,
     Object? badges = null,
-    Object? like = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -130,10 +127,6 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
           ? _value.badges
           : badges // ignore: cast_nullable_to_non_nullable
               as List<Badge>,
-      like: freezed == like
-          ? _value.like
-          : like // ignore: cast_nullable_to_non_nullable
-              as bool?,
     ) as $Val);
   }
 }
@@ -156,8 +149,7 @@ abstract class _$$_ProductCopyWith<$Res> implements $ProductCopyWith<$Res> {
       double? rating,
       @JsonKey(name: "reviews_count") int? reviewsCount,
       String brand,
-      List<Badge> badges,
-      bool? like});
+      List<Badge> badges});
 }
 
 /// @nodoc
@@ -181,7 +173,6 @@ class __$$_ProductCopyWithImpl<$Res>
     Object? reviewsCount = freezed,
     Object? brand = null,
     Object? badges = null,
-    Object? like = freezed,
   }) {
     return _then(_$_Product(
       id: null == id
@@ -228,10 +219,6 @@ class __$$_ProductCopyWithImpl<$Res>
           ? _value._badges
           : badges // ignore: cast_nullable_to_non_nullable
               as List<Badge>,
-      like: freezed == like
-          ? _value.like
-          : like // ignore: cast_nullable_to_non_nullable
-              as bool?,
     ));
   }
 }
@@ -250,8 +237,7 @@ class _$_Product implements _Product {
       this.rating,
       @JsonKey(name: "reviews_count") this.reviewsCount,
       required this.brand,
-      required final List<Badge> badges,
-      this.like})
+      required final List<Badge> badges})
       : _badges = badges;
 
   factory _$_Product.fromJson(Map<String, dynamic> json) =>
@@ -288,11 +274,8 @@ class _$_Product implements _Product {
   }
 
   @override
-  final bool? like;
-
-  @override
   String toString() {
-    return 'Product(id: $id, price: $price, oldPrice: $oldPrice, discount: $discount, name: $name, article: $article, picture: $picture, rating: $rating, reviewsCount: $reviewsCount, brand: $brand, badges: $badges, like: $like)';
+    return 'Product(id: $id, price: $price, oldPrice: $oldPrice, discount: $discount, name: $name, article: $article, picture: $picture, rating: $rating, reviewsCount: $reviewsCount, brand: $brand, badges: $badges)';
   }
 
   @override
@@ -313,8 +296,7 @@ class _$_Product implements _Product {
             (identical(other.reviewsCount, reviewsCount) ||
                 other.reviewsCount == reviewsCount) &&
             (identical(other.brand, brand) || other.brand == brand) &&
-            const DeepCollectionEquality().equals(other._badges, _badges) &&
-            (identical(other.like, like) || other.like == like));
+            const DeepCollectionEquality().equals(other._badges, _badges));
   }
 
   @JsonKey(ignore: true)
@@ -331,8 +313,7 @@ class _$_Product implements _Product {
       rating,
       reviewsCount,
       brand,
-      const DeepCollectionEquality().hash(_badges),
-      like);
+      const DeepCollectionEquality().hash(_badges));
 
   @JsonKey(ignore: true)
   @override
@@ -353,8 +334,7 @@ abstract class _Product implements Product {
       final double? rating,
       @JsonKey(name: "reviews_count") final int? reviewsCount,
       required final String brand,
-      required final List<Badge> badges,
-      final bool? like}) = _$_Product;
+      required final List<Badge> badges}) = _$_Product;
 
   factory _Product.fromJson(Map<String, dynamic> json) = _$_Product.fromJson;
 
@@ -382,8 +362,6 @@ abstract class _Product implements Product {
   String get brand;
   @override
   List<Badge> get badges;
-  @override
-  bool? get like;
   @override
   @JsonKey(ignore: true)
   _$$_ProductCopyWith<_$_Product> get copyWith =>
