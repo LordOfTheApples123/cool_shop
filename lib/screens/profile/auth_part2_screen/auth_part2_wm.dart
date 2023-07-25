@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cool_shop/internal/app_components.dart';
 import 'package:cool_shop/internal/use_case/auth_use_case.dart';
 import 'package:cool_shop/screens/utils/snack_bar_utl.dart';
 import 'package:cool_shop/screens/utils/theme_provider.dart';
@@ -24,10 +25,7 @@ abstract class IAuthPart2WidgetModel extends IWidgetModel
 
 AuthPart2WidgetModel defaultAuthPart2WidgetModelFactory(BuildContext context) {
   return AuthPart2WidgetModel(
-    AuthPart2Model(
-      errorHandler: context.read(),
-      authClient: context.read()
-    ),
+    AuthPart2Model(errorHandler: context.read(), authClient: context.read()),
   );
 }
 
@@ -60,17 +58,20 @@ class AuthPart2WidgetModel extends WidgetModel<AuthPart2Widget, AuthPart2Model>
   TextEditingController codeController = TextEditingController();
 
   @override
-  Future<void> onAuth() async{
-    try{
-final verified = await model.verifyCode(widget.email, codeController.text);
-      if(!verified){
+  Future<void> onAuth() async {
+    try {
+      final verified =
+          await model.verifyCode(widget.email, codeController.text);
+      if (!verified) {
         //компилятору не нравится работа с контекстом в async методах
         _showWrongCodeSnackBar();
         return;
       }
       auth.auth();
+      await AppComponents().serviceWrapper.loadFav();
+      await AppComponents().serviceWrapper.loadCart();
       _popToProfile();
-    } catch (e){
+    } catch (e) {
       debugPrint(e.toString());
       rethrow;
     }
@@ -92,5 +93,5 @@ final verified = await model.verifyCode(widget.email, codeController.text);
   }
 
   @override
-  AuthUseCase get auth => context.read();
+  AuthUseCase auth = AppComponents().authUseCase;
 }

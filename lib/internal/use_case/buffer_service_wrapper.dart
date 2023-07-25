@@ -2,6 +2,7 @@ import 'package:cool_shop/data/model/calculated_cart/calculated_cart.dart';
 import 'package:cool_shop/data/model/cart_product/cart_product.dart';
 import 'package:cool_shop/data/model/product/product.dart';
 import 'package:cool_shop/internal/app_components.dart';
+import 'package:cool_shop/internal/use_case/auth_use_case.dart';
 import 'package:cool_shop/internal/use_case/product_service.dart';
 import 'package:elementary/elementary.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +74,6 @@ class BufferServiceWrapper {
   }
 
   Future<void> _resolve(List<FutureCallback?> list) async {
-
     //здесь немного жиденько
     //просто вызываем запросы
     //огромный простор для оптимизации:
@@ -86,7 +86,6 @@ class BufferServiceWrapper {
     //ещё было бы классно, если бы апи, поддерживало добавление списка
     //id вместо одного id, и можно было бы одним большим запросом, добавить
     //10 продуктов в избранное
-
 
     for (FutureCallback? request in list) {
       await request?.call();
@@ -107,8 +106,11 @@ class BufferServiceWrapper {
     //cart.products - unmodifiable collection
     final products = List<CartProduct>.of(cart?.products ?? []);
 
+    for (CartProduct cartProduct in products) {
+      debugPrint(cartProduct.product.id.toString());
+    }
     final cartProduct = products
-        .where((element) => element.product == preview)
+        .where((element) => element.product.id == preview.id)
         .firstOrNull;
 
     if (cartProduct != null) {
@@ -127,11 +129,15 @@ class BufferServiceWrapper {
     //расскажет и никто не пофиксит, так что делаю сам
     final price = cart?.price ?? "0";
     final finalPrice = double.parse(price) + double.parse(preview.price ?? "0");
-    final newCart =
-    cart?.copyWith(price: finalPrice.toString(), count: cart.count + 1, products: products);
+    final newCart = cart?.copyWith(
+        price: finalPrice.toString(),
+        count: cart.count + 1,
+        products: products);
 
     cartState.loading(newCart);
-    cartState.content(newCart ?? CalculatedCart(price: preview.price ?? "0", count: 1, products: products));
+    cartState.content(newCart ??
+        CalculatedCart(
+            price: finalPrice.toString(), count: 1, products: products));
 
     await _handleCallback(request: () async {
       _productService.addToCart(id);
@@ -237,5 +243,12 @@ class BufferServiceWrapper {
 
   Future<void> loadCart() async {
     await _productService.loadCart();
+  }
+
+  void resetStates() {
+    favState.loading();
+    cartState.loading();
+    favState.content([]);
+    cartState.content(const CalculatedCart(price: "0", count: 0, products: []));
   }
 }

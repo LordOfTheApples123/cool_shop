@@ -3,6 +3,8 @@ import 'package:cool_shop/data/model/calculated_cart/calculated_cart.dart';
 import 'package:cool_shop/data/model/product/product.dart';
 import 'package:cool_shop/data/request/cart_request/cart_request.dart';
 import 'package:cool_shop/data/request/fav_request/favorites_request.dart';
+import 'package:cool_shop/internal/app_components.dart';
+import 'package:cool_shop/internal/use_case/auth_use_case.dart';
 import 'package:elementary/elementary.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +12,8 @@ typedef CartState = EntityStateNotifier<CalculatedCart>;
 typedef FavState = EntityStateNotifier<List<Product>>;
 
 class ProductService {
+
+  final AuthUseCase auth = AppComponents().authUseCase;
   ProductService({
     required client,
   }) : _client = client;
@@ -29,11 +33,17 @@ class ProductService {
   get error => _error;
 
   Future<void> init() async {
+    if(!auth.isAuthorized){
+      return;
+    }
     await loadFavs();
     await loadCart();
   }
 
   Future<void> loadFavs() async {
+    if(!auth.isAuthorized){
+      return;
+    }
     try {
       final data = await _client.getFav();
       _favState.content(data);
@@ -85,6 +95,9 @@ class ProductService {
   }
 
   Future<void> loadCart() async {
+    if(!auth.isAuthorized){
+      return;
+    }
     try {
       final data = await _client.getCalculatedCart();
       _cartState.content(data);

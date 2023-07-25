@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cool_shop/internal/app_components.dart';
 import 'package:cool_shop/internal/navigation/app_router.dart';
 import 'package:cool_shop/internal/use_case/auth_use_case.dart';
+import 'package:cool_shop/internal/use_case/buffer_service_wrapper.dart';
 import 'package:cool_shop/screens/utils/theme_provider.dart';
 import 'package:cool_shop/screens/utils/value_stream_wrapper.dart';
 import 'package:elementary/elementary.dart';
@@ -35,7 +38,10 @@ class ProfileMainWidgetModel
 
   @override
   void onLogOut(){
-    //logout
+    auth.unAuth();
+
+    wrapper.resetStates();
+    AppComponents().tokenRepository.deleteTokens();
   }
 
   @override
@@ -45,6 +51,8 @@ class ProfileMainWidgetModel
 
   @override
   AuthUseCase auth = AppComponents().authUseCase;
+
+  BufferServiceWrapper wrapper = AppComponents().serviceWrapper;
 
 
 }
