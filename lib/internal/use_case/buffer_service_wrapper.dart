@@ -104,18 +104,18 @@ class BufferServiceWrapper {
 
   Future<void> addToCart(int id, Product preview) async {
     final cart = cartState.value?.data;
-    final products = cart?.products ?? [];
+    //cart.products - unmodifiable collection
+    final products = List<CartProduct>.of(cart?.products ?? []);
 
-    final initCount = products
+    final cartProduct = products
         .where((element) => element.product == preview)
-        .firstOrNull
-        ?.count;
+        .firstOrNull;
 
-    if (initCount != null) {
+    if (cartProduct != null) {
       await updateCart(
         id: id,
-        count: initCount + 1,
-        preview: CartProduct(count: initCount + 1, product: preview),
+        count: cartProduct.count + 1,
+        preview: cartProduct,
       );
       return;
     }
@@ -127,8 +127,11 @@ class BufferServiceWrapper {
     //расскажет и никто не пофиксит, так что делаю сам
     final price = cart?.price ?? "0";
     final finalPrice = double.parse(price) + double.parse(preview.price ?? "0");
-    cartState.loading(
-        cart?.copyWith(price: finalPrice.toString(), count: cart.count + 1));
+    final newCart =
+    cart?.copyWith(price: finalPrice.toString(), count: cart.count + 1, products: products);
+
+    cartState.loading(newCart);
+    cartState.content(newCart ?? CalculatedCart(price: preview.price ?? "0", count: 1, products: products));
 
     await _handleCallback(request: () async {
       _productService.addToCart(id);
@@ -175,8 +178,8 @@ class BufferServiceWrapper {
             : cartProduct)
         .toList();
 
-    for (CartProduct element in newProducts) {
-      debugPrint((element.count).toString());
+    for (CartProduct element in products) {
+      debugPrint((element == preview).toString());
     }
 
     final price = cart?.price ?? "0";

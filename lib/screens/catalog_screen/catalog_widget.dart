@@ -74,7 +74,7 @@ class CatalogWidget extends ElementaryWidget<ICatalogWidgetModel> {
                                 liked, products[index].id, products[index]),
                         onBasket: !wm.auth.isAuthorized
                             ? wm.showSnackBar
-                            : () async => wm.onBasket(
+                            : () async => await wm.onBasket(
                                 products[index].id, products[index]),
                       );
                     },

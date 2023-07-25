@@ -11,7 +11,8 @@ import 'package:provider/provider.dart';
 import 'catalog_model.dart';
 import 'catalog_widget.dart';
 
-abstract class ICatalogWidgetModel extends IWidgetModel implements IThemeProvider{
+abstract class ICatalogWidgetModel extends IWidgetModel
+    implements IThemeProvider {
   AuthUseCase get auth;
 
   void showSnackBar();
@@ -22,7 +23,7 @@ abstract class ICatalogWidgetModel extends IWidgetModel implements IThemeProvide
 
   Future<void> onFavorite(bool like, int id, Product preview);
 
-  void onBasket(int id, Product preview) {}
+  Future<void> onBasket(int id, Product preview);
 }
 
 CatalogWidgetModel defaultCatalogWidgetModelFactory(BuildContext context) {
@@ -37,32 +38,29 @@ CatalogWidgetModel defaultCatalogWidgetModelFactory(BuildContext context) {
 class CatalogWidgetModel extends WidgetModel<CatalogWidget, CatalogModel>
     with ThemeProvider
     implements ICatalogWidgetModel {
-
   CatalogWidgetModel(CatalogModel model) : super(model);
 
   @override
   Future<(List<Product>, bool)> loadMore(_) async {
-    try{
+    try {
       final data = await model.getNextPage();
       return data;
-    } catch(e){
+    } catch (e) {
       debugPrint(e.toString());
       rethrow;
     }
   }
+
   @override
   Future<void> onFavorite(bool like, int id, Product preview) async {
-
     debugPrint("onfav");
-    if(like){
+    if (like) {
       await serviceWrapper.removeFromFav(id, preview);
       return;
     }
 
     await serviceWrapper.addToFav(id, preview);
   }
-
-
 
   @override
   BufferServiceWrapper serviceWrapper = AppComponents().serviceWrapper;
@@ -71,10 +69,8 @@ class CatalogWidgetModel extends WidgetModel<CatalogWidget, CatalogModel>
   AuthUseCase auth = AppComponents().authUseCase;
 
   @override
-  void onBasket(int id, Product product) {
-
-    debugPrint("onbasket");
-    serviceWrapper.addToCart(id, product);
+  Future<void> onBasket(int id, Product product) async {
+    await serviceWrapper.addToCart(id, product);
   }
 
   @override

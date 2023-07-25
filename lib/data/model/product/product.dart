@@ -6,13 +6,7 @@ part 'product.g.dart';
 
 part 'product.freezed.dart';
 
-
-
-@Freezed(
-  fromJson: true,
-  toJson: false,
-  equal: true
-)
+@Freezed(fromJson: true, toJson: false, equal: true)
 class Product with _$Product {
   const factory Product({
     required int id,
@@ -23,27 +17,29 @@ class Product with _$Product {
     String? article,
     String? picture,
     double? rating,
-    @JsonKey(name: "reviews_count") int? reviewsCount,
+    @JsonKey(name: "reviews_count")
+    int? reviewsCount,
+
     required String brand,
     required List<Badge> badges,
   }) = _Product;
 
-  factory Product.fromJson(Map<String, dynamic> json) =>_$_Product(
-    id: json['id'] as int,
-    price: json['price'] as String?,
-    oldPrice: json['old_price'] as String?,
-    //Костылим, чтобы не делать 2 сущности с одним отличным полем
-    discount: json['discount'].toString(),
-    name: json['name'] as String?,
-    article: json['article'] as String?,
-    picture: json['picture'] as String?,
-    rating: (json['rating'] as num?)?.toDouble(),
-    reviewsCount: json['reviews_count'] as int?,
-    brand: json['brand'] as String,
-    badges: (json['badges'] as List<dynamic>)
-        .map((e) => Badge.fromJson(e as Map<String, dynamic>))
-        .toList(),
-  );
+  factory Product.fromJson(Map<String, dynamic> json) => _$_Product(
+        id: json['id'] as int,
+        price: json['price'] as String?,
+        oldPrice: json['old_price'] as String?,
+        //Костылим, чтобы не делать 2 сущности с одним отличным полем
+        discount: json['discount'].toString(),
+        name: json['name'] as String?,
+        article: json['article'] as String?,
+        picture: json['picture'] as String?,
+        rating: (json['rating'] as num?)?.toDouble(),
+        reviewsCount: json['reviews_count'] as int?,
+        brand: json['brand'] as String,
+        badges: (json['badges'] as List<dynamic>)
+            .map((e) => Badge.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
 }
 
 @Freezed(
